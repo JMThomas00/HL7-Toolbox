@@ -1,0 +1,21 @@
+id,name,cpt,specialty,category,description,special_needs
+PROC001,Appendectomy,44950,General Surgery,Abdominal,Surgical removal of the appendix,Requires general anesthesia
+PROC002,Cholecystectomy,47562,General Surgery,Abdominal,Laparoscopic removal of gallbladder,May require overnight stay
+PROC003,Hernia Repair,49505,General Surgery,Abdominal,Inguinal hernia repair,Outpatient procedure
+PROC004,Total Knee Replacement,27447,Orthopedics,Joint,Replacement of knee joint,Physical therapy required post-op
+PROC005,Hip Replacement,27130,Orthopedics,Joint,Total hip arthroplasty,Extended recovery period
+PROC006,Shoulder Arthroscopy,29827,Orthopedics,Shoulder,Diagnostic and therapeutic arthroscopy,Sling required post-op
+PROC007,Coronary Artery Bypass,33533,Cardiac Surgery,Cardiovascular,CABG procedure,ICU monitoring required
+PROC008,Valve Replacement,33405,Cardiac Surgery,Cardiovascular,Heart valve replacement surgery,Extended ICU stay
+PROC009,Cataract Surgery,66984,Ophthalmology,Eye,Phacoemulsification with IOL,Same day discharge
+PROC010,LASIK,PRK01,Ophthalmology,Eye,Laser vision correction,Bilateral procedure possible
+PROC011,Tonsillectomy,42826,ENT,Throat,Removal of palatine tonsils,Pediatric common
+PROC012,Septoplasty,30520,ENT,Nasal,Deviated septum repair,May combine with turbinate reduction
+PROC013,Hysterectomy,58150,Gynecology,Reproductive,Total abdominal hysterectomy,Hospital admission required
+PROC014,C-Section,59510,Obstetrics,Delivery,Cesarean delivery,Emergency or scheduled
+PROC015,Mastectomy,19307,Oncology,Breast,Modified radical mastectomy,Oncology consultation required
+PROC016,Lumpectomy,19301,Oncology,Breast,Partial mastectomy,May require radiation follow-up
+PROC017,Craniotomy,61510,Neurosurgery,Brain,Brain surgery access,Neuro ICU monitoring
+PROC018,Spinal Fusion,22558,Neurosurgery,Spine,Lumbar interbody fusion,Prolonged recovery
+PROC019,Colonoscopy,45378,Gastroenterology,GI,Diagnostic colonoscopy with biopsy,Sedation required
+PROC020,Upper Endoscopy,43239,Gastroenterology,GI,EGD with biopsy,Same day procedure

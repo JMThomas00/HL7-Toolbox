@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HL7 Message Creator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Menu Bar -->
+    <div class="menu-bar">
+      <div class="menu">
+        <button class="menu-button">File</button>
+        <div class="menu-dropdown">
+          <button id="menu-new-patient" class="menu-item">New Patient <span class="shortcut">Ctrl+N</span></button>
+          <button id="menu-open-files" class="menu-item">Open File(s) <span class="shortcut">Ctrl+O</span></button>
+          <div class="menu-separator"></div>
+          <button id="menu-save" class="menu-item">Save <span class="shortcut">Ctrl+S</span></button>
+          <button id="menu-save-exit" class="menu-item">Save & Exit <span class="shortcut">Ctrl+Shift+S</span></button>
+          <div class="menu-separator"></div>
+          <button id="menu-quit" class="menu-item">Quit <span class="shortcut">Ctrl+Q</span></button>
+        </div>
+      </div>
+      
+      <div class="menu">
+        <button class="menu-button">View</button>
+        <div class="menu-dropdown">
+          <button id="menu-view-creator" class="menu-item">Creator <span class="shortcut">Ctrl+R</span></button>
+          <button id="menu-view-editor" class="menu-item">Editor <span class="shortcut">Ctrl+E</span></button>
+        </div>
+      </div>
+      
+      <div class="menu">
+        <button class="menu-button">Help</button>
+        <div class="menu-dropdown">
+          <button id="menu-help" class="menu-item">Help</button>
+          <button id="menu-about" class="menu-item">About</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="content-area" class="content-area">
+      <!-- Creator Mode (default) -->
+      <div id="creator-mode" class="mode-container">
+        <div class="main-layout">
+          <!-- Left Panel: Input Form -->
+          <div class="left-panel">
+            <div class="section">
+              <h2 class="section-title">Patient Information</h2>
+              
+              <div class="form-row">
+                <label>Patient MRN:</label>
+                <input type="text" id="patient-mrn" class="uppercase-input">
+                <button id="random-mrn" class="random-btn">Random</button>
+              </div>
+              
+              <div class="form-row">
+                <label>First Name:</label>
+                <input type="text" id="patient-first-name" class="uppercase-input">
+                <button id="random-first-name" class="random-btn">Random</button>
+              </div>
+              
+              <div class="form-row">
+                <label>Last Name:</label>
+                <input type="text" id="patient-last-name" class="uppercase-input">
+                <button id="random-last-name" class="random-btn">Random</button>
+              </div>
+              
+              <div class="form-row">
+                <label>Date of Birth (YYYYMMDD):</label>
+                <input type="text" id="patient-dob" class="uppercase-input" placeholder="YYYYMMDD">
+                <button id="random-dob" class="random-btn">Random</button>
+              </div>
+              
+              <div class="form-row">
+                <label>Gender:</label>
+                <select id="patient-gender">
+                  <option value="M">Male</option>
+                  <option value="F">Female</option>
+                  <option value="O">Other</option>
+                </select>
+              </div>
+              
+              <div class="form-row">
+                <label>Encounter Type:</label>
+                <select id="encounter-type">
+                  <option value="P">Preadmit</option>
+                  <option value="I">Inpatient</option>
+                  <option value="O">Outpatient</option>
+                  <option value="E">Emergency</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="section">
+              <h2 class="section-title">Scheduling Information</h2>
+              
+              <div class="form-row">
+                <label>Date (YYYYMMDD):</label>
+                <input type="text" id="schedule-date" class="uppercase-input" placeholder="YYYYMMDD">
+                <button id="today-date" class="action-btn">Today</button>
+              </div>
+              
+              <div class="form-row">
+                <label>Scheduled Time (HHMMSS):</label>
+                <input type="text" id="scheduled-time" class="uppercase-input" placeholder="HHMMSS">
+              </div>
+              
+              <div class="form-row">
+                <label>Duration (minutes):</label>
+                <input type="number" id="duration" value="60">
+              </div>
+              
+              <div class="form-row">
+                <label>Location OR:</label>
+                <input type="text" id="location-or" class="uppercase-input">
+              </div>
+              
+              <div class="form-row">
+                <label>Location Department:</label>
+                <input type="text" id="location-dept" class="uppercase-input">
+              </div>
+              
+              <div class="form-row">
+                <label>Add-On:</label>
+                <select id="add-on">
+                  <option value="N">No</option>
+                  <option value="Y">Yes</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="section">
+              <h2 class="section-title">Message Type</h2>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="message-type" value="scheduled" checked>
+                  Scheduled Only
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="message-type" value="cancelled">
+                  Cancelled Only
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="message-type" value="events">
+                  Scheduled & Case Events
+                </label>
+              </div>
+            </div>
+
+            <div class="section">
+              <h2 class="section-title">Procedures</h2>
+              <button id="add-procedure" class="action-btn">Add Procedure</button>
+              <div id="procedures-container"></div>
+            </div>
+
+            <div class="section">
+              <h2 class="section-title">Staff Assignment</h2>
+              <div id="staff-container">
+                <div class="form-row">
+                  <label>Surgeon:</label>
+                  <input type="text" id="surgeon" class="uppercase-input">
+                  <button id="random-surgeon" class="random-btn">Random</button>
+                </div>
+                
+                <div class="form-row">
+                  <label>Anesthesiologist:</label>
+                  <input type="text" id="anesthesiologist" class="uppercase-input">
+                  <button id="random-anesthesiologist" class="random-btn">Random</button>
+                </div>
+                
+                <div class="form-row">
+                  <label>Nurse:</label>
+                  <input type="text" id="nurse" class="uppercase-input">
+                  <button id="random-nurse" class="random-btn">Random</button>
+                </div>
+              </div>
+              <button id="add-staff" class="action-btn">Add Custom Staff</button>
+            </div>
+
+            <div class="button-group">
+              <button id="create-message" class="primary-btn">Create Message</button>
+            </div>
+          </div>
+
+          <!-- Right Panel: Preview and Procedure Browser -->
+          <div class="right-panel">
+            <div class="section">
+              <h2 class="section-title-hl7">HL7 Message Preview</h2>
+              <textarea id="message-preview" class="message-preview" readonly></textarea>
+            </div>
+
+            <div class="section">
+              <h2 class="section-title">Procedure Browser</h2>
+              <input type="text" id="procedure-search" placeholder="Search procedures..." class="search-input">
+              <div id="procedure-tree" class="procedure-tree"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Editor Mode -->
+      <div id="editor-mode" class="mode-container" style="display: none;">
+        <div class="editor-layout">
+          <div class="editor-controls">
+            <button id="editor-prev-patient" class="nav-btn">Previous Patient</button>
+            <button id="editor-prev-message" class="nav-btn">Previous</button>
+            <span id="editor-context" class="context-label">No messages loaded</span>
+            <button id="editor-next-message" class="nav-btn">Next</button>
+            <button id="editor-next-patient" class="nav-btn">Next Patient</button>
+          </div>
+
+          <div class="editor-main">
+            <div class="editor-left">
+              <h3>Edit Fields</h3>
+              <div id="editor-fields" class="editor-fields">
+                <div class="form-row">
+                  <label>Patient MRN:</label>
+                  <input type="text" id="edit-patient-mrn" class="uppercase-input">
+                </div>
+                <div class="form-row">
+                  <label>Location OR:</label>
+                  <input type="text" id="edit-location-or" class="uppercase-input">
+                </div>
+                <div class="form-row">
+                  <label>Location Department:</label>
+                  <input type="text" id="edit-location-dept" class="uppercase-input">
+                </div>
+              </div>
+              
+              <div class="button-group">
+                <button id="editor-apply" class="action-btn">Apply to Current</button>
+                <button id="editor-apply-all" class="action-btn">Apply to All</button>
+                <button id="editor-direct-edit" class="action-btn">Direct Edit</button>
+              </div>
+            </div>
+
+            <div class="editor-right">
+              <h3>Message Preview</h3>
+              <textarea id="editor-preview" class="message-preview" readonly></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Procedure Details -->
+  <div id="procedure-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="modal-procedure-name"></h2>
+      <p><strong>CPT Code:</strong> <span id="modal-procedure-cpt"></span></p>
+      <p><strong>Description:</strong> <span id="modal-procedure-desc"></span></p>
+      <p><strong>Special Needs:</strong> <span id="modal-procedure-needs"></span></p>
+      <button id="modal-select-procedure" class="primary-btn">Select Procedure</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

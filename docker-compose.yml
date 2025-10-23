@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  hl7-creator:
+    build: .
+    container_name: hl7-message-creator
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=production
+      - DISPLAY=:99
+    restart: unless-stopped
+
+  # Placeholder for Mirth Connect integration (for future use)
+  # mirth:
+  #   image: nextgenhealthcare/connect:latest
+  #   container_name: mirth-connect
+  #   ports:
+  #     - "8080:8080"
+  #     - "6661:6661"
+  #   volumes:
+  #     - ./mirth/appdata:/opt/connect/appdata
+  #   restart: unless-stopped
+
+networks:
+  default:
+    name: hl7-network
