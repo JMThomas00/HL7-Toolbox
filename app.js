@@ -29,6 +29,24 @@ AIG|1|||||{YYYYMMDD}{scheduledTime}|0|M|{duration}|M|||{surgeonID}^{surgeon}^^^^
 AIP|1||{anesthesiologistID}^{anesthesiologist}^^^^^^^^^^^^^PI|||||{YYYYMMDD}{scheduledTime}|0|M|{duration}|M
 AIL|1||^{locationOR}^{locationDepartment}|||||{YYYYMMDD}{scheduledTime}|0|M|{duration}|M`;
 
+// Preview Template for Live Updates (user-specified format)
+const PREVIEW_HL7_TEMPLATE = `MSH|^~\\&|EPIC|NC||NC|{YYYYMMDD}{eventTime}||SIU^S14|{patientMRN}|P|2.5
+SCH||{patientMRN}|||||||{duration}|M|^^^{YYYYMMDD}{scheduledTime}
+ZCS||{addOn}|ORSCH_S14||||{cptCode}^{procedure}^CPT
+PID|1||{patientMRN}^^^MRN^MRN||{patientLastName}^{patientFirstName}||{patientDOB}|{patientGender}|{patientLastName}^{patientFirstName}^^|||||||||{patientMRN}
+PV1||IP|NC-PERIOP^^^NC|||||||GEN|||||||||{patientMRN}
+RGS|
+OBX|1|DTM|{caseEvent}|In|{YYYYMMDD}{eventTime}|||||||||{YYYYMMDD}{eventTime}||||||||||||||||||
+AIS|1||{procedureId}^{procedure}|{YYYYMMDD}{scheduledTime}|0|M|{duration}|M||||2
+NTE|1||{procedureDescription}|Procedure Description|||
+NTE|2||{specialNeeds}|Case Notes|||
+AIL|1||^{locationOR}^^{locationDepartment}
+AIP|1||{surgeonID}^{primaryLastName}^{primaryFirstName}^W^^^^^EPIC^^^^PROVID|1.1^Primary Surgeon|GEN|{YYYYMMDD}{scheduledTime}|0|S|{duration}|S
+AIP|2||{staffID}^{lastName}^{firstName}^W^^^^^EPIC^^^^PROVID|4.20^Circulator|GEN|{YYYYMMDD}{scheduledTime}|0|S|{duration}|S
+AIP|3||{staffID}^{lastName}^{firstName}^W^^^^^EPIC^^^^PROVID|4.150^Scrub|GEN|{YYYYMMDD}{scheduledTime}|0|S|{duration}|S
+AIP|4||{staffID}^{lastName}^{firstName}^W^^^^^EPIC^^^^PROVID|2.20^ANE CRNA|GEN|{YYYYMMDD}{scheduledTime}|0|S|{duration}|S
+AIP|5||{staffID}^{lastName}^{firstName}^W^^^^^EPIC^^^^PROVID|2.139^Anesthesiologist|GEN|{YYYYMMDD}{scheduledTime}|0|S|{duration}|S`;
+
 // Utility Functions
 function formatDate(date) {
   const year = date.getFullYear();
@@ -77,6 +95,65 @@ function getRandomElement(array) {
 function generateRandomMRN() {
   appState.lastMRN++;
   return String(appState.lastMRN).padStart(6, '0');
+}
+
+// Preview Update Function
+function updatePreview() {
+  // Collect current form data
+  const formData = {
+    patientMRN: document.getElementById('patient-mrn')?.value || '',
+    patientFirstName: document.getElementById('patient-first-name')?.value || '',
+    patientLastName: document.getElementById('patient-last-name')?.value || '',
+    patientDOB: document.getElementById('patient-dob')?.value || '',
+    patientGender: document.getElementById('patient-gender')?.value || 'M',
+    YYYYMMDD: document.getElementById('schedule-date')?.value || '',
+    scheduledTime: document.getElementById('scheduled-time')?.value || '',
+    duration: document.getElementById('duration')?.value || '60',
+    locationOR: document.getElementById('location-or')?.value || '',
+    locationDepartment: document.getElementById('location-dept')?.value || '',
+    addOn: document.getElementById('add-on')?.value || 'N',
+    eventTime: formatTime(new Date()),
+    caseEvent: 'Case Start'
+  };
+
+  // Parse surgeon name to extract first and last name
+  const surgeonName = document.getElementById('surgeon')?.value || '';
+  const surgeonParts = surgeonName.trim().split(/\s+/);
+  formData.primaryFirstName = surgeonParts.length > 0 ? surgeonParts[0] : '';
+  formData.primaryLastName = surgeonParts.length > 1 ? surgeonParts.slice(1).join(' ') : '';
+  formData.surgeonID = '12345'; // Default surgeon ID
+
+  // For staff placeholders (generic staff - these would be from additional staff entries)
+  formData.staffID = '00000';
+  formData.firstName = '';
+  formData.lastName = '';
+
+  // Get first procedure data if available
+  const firstProcName = document.getElementById('proc-1-name')?.value || '';
+  const firstProcCpt = document.getElementById('proc-1-cpt')?.value || '';
+  const firstProcDesc = document.getElementById('proc-1-desc')?.value || '';
+  const firstProcNeeds = document.getElementById('proc-1-needs')?.value || '';
+
+  formData.procedure = firstProcName;
+  formData.cptCode = firstProcCpt;
+  formData.procedureId = firstProcName ? 'PROC001' : '';
+  formData.procedureDescription = firstProcDesc;
+  formData.specialNeeds = firstProcNeeds;
+
+  // Generate preview message
+  let preview = PREVIEW_HL7_TEMPLATE;
+
+  // Replace all placeholders
+  for (const [key, value] of Object.entries(formData)) {
+    const placeholder = `{${key}}`;
+    preview = preview.replaceAll(placeholder, value || '');
+  }
+
+  // Update the preview textarea
+  const previewElement = document.getElementById('message-preview');
+  if (previewElement) {
+    previewElement.value = preview;
+  }
 }
 
 // CSV Data Loading
@@ -136,7 +213,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Set today's date as default
   document.getElementById('schedule-date').value = formatDate(new Date());
-  
+
+  // Initialize preview
+  updatePreview();
+
   console.log('Application initialized successfully');
 });
 
@@ -235,51 +315,59 @@ function setupCreatorHandlers() {
   // Random buttons
   document.getElementById('random-mrn').addEventListener('click', () => {
     document.getElementById('patient-mrn').value = generateRandomMRN();
+    updatePreview();
   });
-  
+
   document.getElementById('random-first-name').addEventListener('click', () => {
     const firstNames = ['JOHN', 'JANE', 'MICHAEL', 'SARAH', 'DAVID', 'EMILY', 'JAMES', 'OLIVIA'];
     document.getElementById('patient-first-name').value = getRandomElement(firstNames);
+    updatePreview();
   });
-  
+
   document.getElementById('random-last-name').addEventListener('click', () => {
     const lastNames = ['SMITH', 'JOHNSON', 'WILLIAMS', 'BROWN', 'JONES', 'GARCIA', 'MILLER', 'DAVIS'];
     document.getElementById('patient-last-name').value = getRandomElement(lastNames);
+    updatePreview();
   });
-  
+
   document.getElementById('random-dob').addEventListener('click', () => {
     const year = 1940 + Math.floor(Math.random() * 60);
     const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
     const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
     document.getElementById('patient-dob').value = `${year}${month}${day}`;
+    updatePreview();
   });
-  
+
   document.getElementById('today-date').addEventListener('click', () => {
     document.getElementById('schedule-date').value = formatDate(new Date());
+    updatePreview();
   });
-  
+
   // Staff random buttons
   document.getElementById('random-surgeon').addEventListener('click', () => {
     const surgeons = appState.staff.filter(s => s.role === 'Surgeon');
     if (surgeons.length > 0) {
       const surgeon = getRandomElement(surgeons);
       document.getElementById('surgeon').value = surgeon.name;
+      updatePreview();
     }
   });
-  
+
   document.getElementById('random-anesthesiologist').addEventListener('click', () => {
     const anesths = appState.staff.filter(s => s.role === 'Anesthesiologist');
     if (anesths.length > 0) {
       const anesth = getRandomElement(anesths);
       document.getElementById('anesthesiologist').value = anesth.name;
+      updatePreview();
     }
   });
-  
+
   document.getElementById('random-nurse').addEventListener('click', () => {
     const nurses = appState.staff.filter(s => s.role === 'Nurse');
     if (nurses.length > 0) {
       const nurse = getRandomElement(nurses);
       document.getElementById('nurse').value = nurse.name;
+      updatePreview();
     }
   });
   
@@ -291,16 +379,43 @@ function setupCreatorHandlers() {
   
   // Procedure search
   document.getElementById('procedure-search').addEventListener('input', filterProcedures);
+
+  // Add event listeners for live preview updates
+  const previewInputs = [
+    'patient-mrn',
+    'patient-first-name',
+    'patient-last-name',
+    'patient-dob',
+    'patient-gender',
+    'encounter-type',
+    'schedule-date',
+    'scheduled-time',
+    'duration',
+    'location-or',
+    'location-dept',
+    'add-on',
+    'surgeon',
+    'anesthesiologist',
+    'nurse'
+  ];
+
+  previewInputs.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('input', updatePreview);
+      element.addEventListener('change', updatePreview);
+    }
+  });
 }
 
 function addProcedure() {
   const container = document.getElementById('procedures-container');
   const procedureNum = container.children.length + 1;
-  
+
   const procedureDiv = document.createElement('div');
   procedureDiv.className = 'procedure-item';
   procedureDiv.dataset.procedureNum = procedureNum;
-  
+
   procedureDiv.innerHTML = `
     <div class="procedure-header">
       <span class="procedure-number">Procedure ${procedureNum}</span>
@@ -323,8 +438,19 @@ function addProcedure() {
       <input type="text" id="proc-${procedureNum}-needs" class="uppercase-input">
     </div>
   `;
-  
+
   container.appendChild(procedureDiv);
+
+  // Add event listeners to the new procedure inputs for live preview
+  ['name', 'cpt', 'desc', 'needs'].forEach(field => {
+    const input = document.getElementById(`proc-${procedureNum}-${field}`);
+    if (input) {
+      input.addEventListener('input', updatePreview);
+      input.addEventListener('change', updatePreview);
+    }
+  });
+
+  updatePreview();
 }
 
 function removeProcedure(num) {
@@ -333,6 +459,7 @@ function removeProcedure(num) {
   if (procedure) {
     container.removeChild(procedure);
     renumberProcedures();
+    updatePreview();
   }
 }
 
@@ -572,6 +699,8 @@ function selectProcedure(proc) {
   document.getElementById(`proc-${emptySlot}-cpt`).value = proc.cpt;
   document.getElementById(`proc-${emptySlot}-desc`).value = proc.description || '';
   document.getElementById(`proc-${emptySlot}-needs`).value = proc.special_needs || '';
+
+  updatePreview();
 }
 
 function filterProcedures() {
