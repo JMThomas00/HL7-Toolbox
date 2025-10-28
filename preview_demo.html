@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HL7 Message Creator - Preview Demo</title>
+  <style>
+    /* Color Scheme */
+    :root {
+      --bg-color: #1F2139;
+      --text-color: #FFFFFF;
+      --preview-bg: #1E1E1E;
+      --title-hl7: #465BE7;
+      --title-creator: #7DCAE3;
+      --dithered-text: #808080;
+      --match-bg: #2C3DAA;
+      --selected-match-bg: #465BE7;
+      --input-bg: #2A2D4A;
+      --border-color: #3A3D5A;
+      --button-bg: #465BE7;
+      --button-hover: #5A6FF7;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      overflow: hidden;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* Menu Bar */
+    .menu-bar {
+      display: flex;
+      background-color: #2A2D4A;
+      border-bottom: 1px solid var(--border-color);
+      padding: 0;
+    }
+
+    .menu-button {
+      background: none;
+      border: none;
+      color: var(--text-color);
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .menu-button:hover {
+      background-color: var(--button-bg);
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      overflow: hidden;
+      padding: 10px;
+    }
+
+    /* Creator Mode Layout */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .left-panel,
+    .right-panel {
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-color);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--button-bg);
+    }
+
+    /* Sections */
+    .section {
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .section-title {
+      color: var(--title-creator);
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .section-title-hl7 {
+      color: var(--title-hl7);
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    /* Form Elements */
+    .form-row {
+      display: grid;
+      grid-template-columns: 180px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--text-color);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      background-color: var(--preview-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-color);
+      padding: 6px 10px;
+      font-size: 13px;
+      font-family: 'Consolas', 'Courier New', monospace;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--button-bg);
+    }
+
+    .uppercase-input {
+      text-transform: uppercase;
+    }
+
+    /* Buttons */
+    .random-btn,
+    .action-btn {
+      background-color: var(--button-bg);
+      border: none;
+      border-radius: 4px;
+      color: var(--text-color);
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .random-btn:hover,
+    .action-btn:hover {
+      background-color: var(--button-hover);
+    }
+
+    .primary-btn {
+      background-color: var(--button-bg);
+      border: none;
+      border-radius: 6px;
+      color: var(--text-color);
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      width: 100%;
+    }
+
+    .primary-btn:hover {
+      background-color: var(--button-hover);
+    }
+
+    /* Radio Buttons */
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .radio-label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .radio-label input[type="radio"] {
+      margin-right: 8px;
+      cursor: pointer;
+    }
+
+    /* Message Preview */
+    .message-preview {
+      width: 100%;
+      height: 500px;
+      background-color: var(--preview-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: #4ADE80;
+      padding: 10px;
+      font-size: 12px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      resize: vertical;
+      white-space: pre;
+      overflow-wrap: normal;
+      overflow-x: auto;
+    }
+
+    .demo-badge {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      font-weight: 600;
+      border-bottom: 2px solid #5a67d8;
+    }
+
+    .highlight {
+      background-color: rgba(70, 91, 231, 0.3);
+      border-left: 3px solid var(--title-hl7);
+      padding-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Demo Badge -->
+    <div class="demo-badge">
+      🎨 HL7 Message Creator - Interactive Preview Demo - Try typing in the form fields!
+    </div>
+
+    <!-- Menu Bar -->
+    <div class="menu-bar">
+      <button class="menu-button">File</button>
+      <button class="menu-button">View</button>
+      <button class="menu-button">Help</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content-area">
+      <div class="main-layout">
+        <!-- Left Panel: Input Form -->
+        <div class="left-panel">
+          <div class="section">
+            <h2 class="section-title">Patient Information</h2>
+
+            <div class="form-row">
+              <label>Patient MRN:</label>
+              <input type="text" id="patient-mrn" class="uppercase-input" placeholder="Enter MRN">
+              <button class="random-btn" onclick="randomMRN()">Random</button>
+            </div>
+
+            <div class="form-row">
+              <label>First Name:</label>
+              <input type="text" id="patient-first-name" class="uppercase-input" placeholder="First Name">
+              <button class="random-btn" onclick="randomFirstName()">Random</button>
+            </div>
+
+            <div class="form-row">
+              <label>Last Name:</label>
+              <input type="text" id="patient-last-name" class="uppercase-input" placeholder="Last Name">
+              <button class="random-btn" onclick="randomLastName()">Random</button>
+            </div>
+
+            <div class="form-row">
+              <label>Date of Birth (YYYYMMDD):</label>
+              <input type="text" id="patient-dob" class="uppercase-input" placeholder="YYYYMMDD">
+              <button class="random-btn" onclick="randomDOB()">Random</button>
+            </div>
+
+            <div class="form-row">
+              <label>Gender:</label>
+              <select id="patient-gender">
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+                <option value="O">Other</option>
+              </select>
+              <span></span>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">Scheduling Information</h2>
+
+            <div class="form-row">
+              <label>Date (YYYYMMDD):</label>
+              <input type="text" id="schedule-date" class="uppercase-input" placeholder="YYYYMMDD">
+              <button class="action-btn" onclick="setToday()">Today</button>
+            </div>
+
+            <div class="form-row">
+              <label>Scheduled Time (HHMMSS):</label>
+              <input type="text" id="scheduled-time" class="uppercase-input" placeholder="HHMMSS">
+              <span></span>
+            </div>
+
+            <div class="form-row">
+              <label>Duration (minutes):</label>
+              <input type="number" id="duration" value="60">
+              <span></span>
+            </div>
+
+            <div class="form-row">
+              <label>Location OR:</label>
+              <input type="text" id="location-or" class="uppercase-input" placeholder="OR Room">
+              <span></span>
+            </div>
+
+            <div class="form-row">
+              <label>Location Department:</label>
+              <input type="text" id="location-dept" class="uppercase-input" placeholder="Department">
+              <span></span>
+            </div>
+
+            <div class="form-row">
+              <label>Add-On:</label>
+              <select id="add-on">
+                <option value="N">No</option>
+                <option value="Y">Yes</option>
+              </select>
+              <span></span>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">Procedure Information</h2>
+
+            <div class="form-row">
+              <label>Procedure Name:</label>
+              <input type="text" id="proc-name" class="uppercase-input" placeholder="Procedure">
+              <span></span>
+            </div>
+
+            <div class="form-row">
+              <label>CPT Code:</label>
+              <input type="text" id="proc-cpt" class="uppercase-input" placeholder="CPT Code">
+              <span></span>
+            </div>
+
+            <div class="form-row">
+              <label>Description:</label>
+              <input type="text" id="proc-desc" class="uppercase-input" placeholder="Description">
+              <span></span>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">Staff Assignment</h2>
+
+            <div class="form-row">
+              <label>Surgeon Name:</label>
+              <input type="text" id="surgeon" class="uppercase-input" placeholder="Surgeon Name">
+              <button class="random-btn" onclick="randomSurgeon()">Random</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel: Preview -->
+        <div class="right-panel">
+          <div class="section highlight">
+            <h2 class="section-title-hl7">✨ HL7 Message Preview (Live Updates!)</h2>
+            <textarea id="message-preview" class="message-preview" readonly></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Live Preview Template
+    const PREVIEW_TEMPLATE = `MSH|^~\\&|EPIC|NC||NC|{YYYYMMDD}{eventTime}||SIU^S14|{patientMRN}|P|2.5
+SCH||{patientMRN}|||||||{duration}|M|^^^{YYYYMMDD}{scheduledTime}
+ZCS||{addOn}|ORSCH_S14||||{cptCode}^{procedure}^CPT
+PID|1||{patientMRN}^^^MRN^MRN||{patientLastName}^{patientFirstName}||{patientDOB}|{patientGender}|{patientLastName}^{patientFirstName}^^|||||||||{patientMRN}
+PV1||IP|NC-PERIOP^^^NC|||||||GEN|||||||||{patientMRN}
+RGS|
+OBX|1|DTM|{caseEvent}|In|{YYYYMMDD}{eventTime}|||||||||{YYYYMMDD}{eventTime}||||||||||||||||||
+AIS|1||{procedureId}^{procedure}|{YYYYMMDD}{scheduledTime}|0|M|{duration}|M||||2
+NTE|1||{procedureDescription}|Procedure Description|||
+NTE|2||{specialNeeds}|Case Notes|||
+AIL|1||^{locationOR}^^{locationDepartment}
+AIP|1||{surgeonID}^{primaryLastName}^{primaryFirstName}^W^^^^^EPIC^^^^PROVID|1.1^Primary Surgeon|GEN|{YYYYMMDD}{scheduledTime}|0|S|{duration}|S
+AIP|2||{staffID}^{lastName}^{firstName}^W^^^^^EPIC^^^^PROVID|4.20^Circulator|GEN|{YYYYMMDD}{scheduledTime}|0|S|{duration}|S
+AIP|3||{staffID}^{lastName}^{firstName}^W^^^^^EPIC^^^^PROVID|4.150^Scrub|GEN|{YYYYMMDD}{scheduledTime}|0|S|{duration}|S
+AIP|4||{staffID}^{lastName}^{firstName}^W^^^^^EPIC^^^^PROVID|2.20^ANE CRNA|GEN|{YYYYMMDD}{scheduledTime}|0|S|{duration}|S
+AIP|5||{staffID}^{lastName}^{firstName}^W^^^^^EPIC^^^^PROVID|2.139^Anesthesiologist|GEN|{YYYYMMDD}{scheduledTime}|0|S|{duration}|S`;
+
+    function formatDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}${month}${day}`;
+    }
+
+    function formatTime(date) {
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      return `${hours}${minutes}${seconds}`;
+    }
+
+    function updatePreview() {
+      const formData = {
+        patientMRN: document.getElementById('patient-mrn')?.value || '',
+        patientFirstName: document.getElementById('patient-first-name')?.value || '',
+        patientLastName: document.getElementById('patient-last-name')?.value || '',
+        patientDOB: document.getElementById('patient-dob')?.value || '',
+        patientGender: document.getElementById('patient-gender')?.value || 'M',
+        YYYYMMDD: document.getElementById('schedule-date')?.value || '',
+        scheduledTime: document.getElementById('scheduled-time')?.value || '',
+        duration: document.getElementById('duration')?.value || '60',
+        locationOR: document.getElementById('location-or')?.value || '',
+        locationDepartment: document.getElementById('location-dept')?.value || '',
+        addOn: document.getElementById('add-on')?.value || 'N',
+        eventTime: formatTime(new Date()),
+        caseEvent: 'Case Start',
+        procedure: document.getElementById('proc-name')?.value || '',
+        cptCode: document.getElementById('proc-cpt')?.value || '',
+        procedureId: document.getElementById('proc-name')?.value ? 'PROC001' : '',
+        procedureDescription: document.getElementById('proc-desc')?.value || '',
+        specialNeeds: '',
+        staffID: '00000',
+        firstName: '',
+        lastName: ''
+      };
+
+      // Parse surgeon name
+      const surgeonName = document.getElementById('surgeon')?.value || '';
+      const surgeonParts = surgeonName.trim().split(/\s+/);
+      formData.primaryFirstName = surgeonParts.length > 0 ? surgeonParts[0] : '';
+      formData.primaryLastName = surgeonParts.length > 1 ? surgeonParts.slice(1).join(' ') : '';
+      formData.surgeonID = '12345';
+
+      let preview = PREVIEW_TEMPLATE;
+      for (const [key, value] of Object.entries(formData)) {
+        const placeholder = `{${key}}`;
+        preview = preview.replaceAll(placeholder, value || '');
+      }
+
+      document.getElementById('message-preview').value = preview;
+    }
+
+    // Random data generators
+    function randomMRN() {
+      document.getElementById('patient-mrn').value = String(Math.floor(Math.random() * 900000) + 100000);
+      updatePreview();
+    }
+
+    function randomFirstName() {
+      const names = ['JOHN', 'JANE', 'MICHAEL', 'SARAH', 'DAVID', 'EMILY', 'JAMES', 'OLIVIA'];
+      document.getElementById('patient-first-name').value = names[Math.floor(Math.random() * names.length)];
+      updatePreview();
+    }
+
+    function randomLastName() {
+      const names = ['SMITH', 'JOHNSON', 'WILLIAMS', 'BROWN', 'JONES', 'GARCIA', 'MILLER', 'DAVIS'];
+      document.getElementById('patient-last-name').value = names[Math.floor(Math.random() * names.length)];
+      updatePreview();
+    }
+
+    function randomDOB() {
+      const year = 1940 + Math.floor(Math.random() * 60);
+      const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+      const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+      document.getElementById('patient-dob').value = `${year}${month}${day}`;
+      updatePreview();
+    }
+
+    function setToday() {
+      document.getElementById('schedule-date').value = formatDate(new Date());
+      updatePreview();
+    }
+
+    function randomSurgeon() {
+      const surgeons = ['DR SMITH', 'DR JOHNSON', 'DR WILLIAMS', 'DR CHEN', 'DR PATEL'];
+      document.getElementById('surgeon').value = surgeons[Math.floor(Math.random() * surgeons.length)];
+      updatePreview();
+    }
+
+    // Add event listeners to all inputs
+    document.addEventListener('DOMContentLoaded', () => {
+      const inputs = [
+        'patient-mrn', 'patient-first-name', 'patient-last-name', 'patient-dob',
+        'patient-gender', 'schedule-date', 'scheduled-time', 'duration',
+        'location-or', 'location-dept', 'add-on', 'proc-name', 'proc-cpt',
+        'proc-desc', 'surgeon'
+      ];
+
+      inputs.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.addEventListener('input', updatePreview);
+          element.addEventListener('change', updatePreview);
+        }
+      });
+
+      // Set initial values
+      setToday();
+      updatePreview();
+    });
+  </script>
+</body>
+</html>
