@@ -214,6 +214,8 @@ MIT License
 
 For issues, questions, or feature requests, please open an issue on GitHub.
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/JMThomas00/HL7-Toolbox)
+
 ## Acknowledgments
 
 This is an Electron conversion of the original Python/Tkinter HL7MessageCreator application.
