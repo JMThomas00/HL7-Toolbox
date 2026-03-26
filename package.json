@@ -1,0 +1,54 @@
+{
+  "name": "hl7-toolbox",
+  "version": "1.0.0",
+  "description": "Plugin-based toolbox for healthcare HL7 v2.5 testing and integration",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "keywords": [
+    "hl7",
+    "healthcare",
+    "testing",
+    "electron",
+    "medical-integration"
+  ],
+  "author": "JMThomas00",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^27.3.11",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.hl7toolbox.app",
+    "productName": "HL7 Toolbox",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "data/**/*",
+      "config/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.developer-tools"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png",
+      "category": "Development"
+    }
+  }
+}

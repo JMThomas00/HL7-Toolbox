@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Build output
+dist/
+out/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS files
+Thumbs.db
+desktop.ini
+
+# Electron
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Configuration (user-specific)
+config/app-settings.json
+config/plugins/*.json
+
+# Data (user-specific)
+data/templates/*.hl7
+
+# Claude Code memory (development only)
+.claude/
+
+# Temporary files
+*.tmp
+*.temp
+mnt/
+
+# Test coverage
+coverage/
+.nyc_output/

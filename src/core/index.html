@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HL7 Toolbox</title>
+  
+  <!-- Core Styles -->
+  <link rel="stylesheet" href="styles/theme.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Menu Bar -->
+    <div class="menu-bar">
+      <div class="menu">
+        <button class="menu-button">File</button>
+        <div class="menu-dropdown">
+          <button id="menu-new" class="menu-item">
+            New <span class="shortcut">Ctrl+N</span>
+          </button>
+          <button id="menu-open" class="menu-item">
+            Open <span class="shortcut">Ctrl+O</span>
+          </button>
+          <div class="menu-separator"></div>
+          <button id="menu-save" class="menu-item">
+            Save <span class="shortcut">Ctrl+S</span>
+          </button>
+          <button id="menu-save-as" class="menu-item">
+            Save As <span class="shortcut">Ctrl+Shift+S</span>
+          </button>
+          <div class="menu-separator"></div>
+          <button id="menu-quit" class="menu-item">
+            Quit <span class="shortcut">Ctrl+Q</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="menu">
+        <button class="menu-button">Edit</button>
+        <div class="menu-dropdown">
+          <button id="menu-undo" class="menu-item">
+            Undo <span class="shortcut">Ctrl+Z</span>
+          </button>
+          <button id="menu-redo" class="menu-item">
+            Redo <span class="shortcut">Ctrl+Y</span>
+          </button>
+          <div class="menu-separator"></div>
+          <button id="menu-copy" class="menu-item">
+            Copy <span class="shortcut">Ctrl+C</span>
+          </button>
+          <button id="menu-paste" class="menu-item">
+            Paste <span class="shortcut">Ctrl+V</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="menu">
+        <button class="menu-button">View</button>
+        <div class="menu-dropdown">
+          <button id="menu-zoom-in" class="menu-item">
+            Zoom In <span class="shortcut">Ctrl++</span>
+          </button>
+          <button id="menu-zoom-out" class="menu-item">
+            Zoom Out <span class="shortcut">Ctrl+-</span>
+          </button>
+          <button id="menu-zoom-reset" class="menu-item">
+            Reset Zoom <span class="shortcut">Ctrl+0</span>
+          </button>
+          <div class="menu-separator"></div>
+          <div class="menu-submenu-label">Themes</div>
+          <button id="menu-theme-classiq" class="menu-item menu-item-theme" data-theme="classiq">
+            <span class="theme-check">✓</span> Classiq
+          </button>
+          <button id="menu-theme-dracula" class="menu-item menu-item-theme" data-theme="dracula">
+            <span class="theme-check">✓</span> Dracula
+          </button>
+          <div class="menu-separator"></div>
+          <button id="menu-toggle-devtools" class="menu-item">
+            Toggle DevTools <span class="shortcut">F12</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="menu">
+        <button class="menu-button">Plugins</button>
+        <div class="menu-dropdown">
+          <button id="menu-plugin-manager" class="menu-item">
+            Manage Plugins
+          </button>
+          <button id="menu-plugin-reload" class="menu-item">
+            Reload All Plugins
+          </button>
+        </div>
+      </div>
+      
+      <div class="menu">
+        <button class="menu-button">Help</button>
+        <div class="menu-dropdown">
+          <button id="menu-documentation" class="menu-item">
+            Documentation
+          </button>
+          <button id="menu-shortcuts" class="menu-item">
+            Keyboard Shortcuts
+          </button>
+          <div class="menu-separator"></div>
+          <button id="menu-about" class="menu-item">
+            About HL7 Toolbox
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar" id="tab-bar">
+      <!-- Tabs will be dynamically added here -->
+    </div>
+
+    <!-- Plugin Container -->
+    <div class="plugin-container" id="plugin-container">
+      <!-- Plugin content will be dynamically loaded here -->
+      <div class="empty-state">
+        <div class="empty-state-icon">📦</div>
+        <div class="empty-state-title">No Plugin Active</div>
+        <div class="empty-state-description">
+          Select a plugin from the tabs above or use the Plugins menu to get started.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Container -->
+  <div id="notification-container"></div>
+
+  <!-- Modal Overlay -->
+  <div class="modal-overlay" id="modal-overlay" style="display: none;">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title">Modal Title</div>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        Modal content goes here
+      </div>
+      <div class="modal-footer" id="modal-footer">
+        <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
+        <button class="btn btn-primary" id="modal-confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core Application Scripts -->
+  <script src="../plugins/base-plugin.js"></script>
+  <script src="services/event-bus.js"></script>
+  <script src="services/config-service.js"></script>
+  <script src="services/file-service.js"></script>
+  <script src="services/csv-service.js"></script>
+  <script src="services/template-service.js"></script>
+  <script src="services/theme-service.js"></script>
+  <script src="services/plugin-manager.js"></script>
+  <script src="components/notification.js"></script>
+  <script src="components/modal.js"></script>
+  <script src="components/tab-bar.js"></script>
+  <script src="components/menu-bar.js"></script>
+  
+  <!-- Plugin Scripts -->
+  <script src="../plugins/hl7-creator/plugin.js"></script>
+  <script src="../plugins/hl7-creator/plugin-helpers.js"></script>
+  <script src="../plugins/hl7-creator/plugin-message.js"></script>
+  
+  <!-- Main Application -->
+  <script src="app.js"></script>
+</body>
+</html>
