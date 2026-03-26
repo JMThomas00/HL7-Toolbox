@@ -39,6 +39,7 @@ data/templates/*.hl7
 
 # Claude Code memory (development only)
 .claude/
+claude.md
 
 # Temporary files
 *.tmp
