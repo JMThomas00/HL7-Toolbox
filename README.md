@@ -1,10 +1,10 @@
-# HL7 Message Creator - Electron
+# HL7-Toolbox
 
 A desktop application for creating and editing healthcare HL7 messages, built with Electron.
 
 ## Overview
 
-The HL7 Message Creator is a cross-platform desktop GUI application designed for healthcare IT professionals who need to generate and modify standardized HL7 messages for scheduling surgical procedures (SIU) and managing patient data (ADT).
+The HL7-Toolbox is a cross-platform desktop GUI application designed for healthcare IT professionals who need to generate and modify standardized HL7 messages for scheduling surgical procedures (SIU) and managing patient data (ADT).
 
 ## Features
 
@@ -216,4 +216,4 @@ For issues, questions, or feature requests, please open an issue on GitHub.
 
 ## Acknowledgments
 
-This is an Electron conversion of the original Python/Tkinter HL7 Message Creator application.
+This is an Electron conversion of the original Python/Tkinter HL7MessageCreator application.
